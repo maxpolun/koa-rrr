@@ -1,0 +1,30 @@
+{
+  "name": "koa-rrr",
+  "version": "1.0.0",
+  "description": "Koa middleware for rendering a react app using react-router and redux",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxpolun/koa-rrr.git"
+  },
+  "author": "Max Polun <maxpolun@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maxpolun/koa-rrr/issues"
+  },
+  "homepage": "https://github.com/maxpolun/koa-rrr#readme",
+  "dependencies": {
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
+    "react-redux": "^4.4.0",
+    "react-router": "^2.0.0"
+  },
+  "devDependencies": {
+    "jasmine": "^2.4.1",
+    "koa": "^1.1.2",
+    "standard": "^6.0.5"
+  }
+}
