@@ -2,7 +2,7 @@
 let React = require('react')
 let ReactDOMServer = require('react-dom/server')
 let Router = require('react-router')
-let Provider = require('react-redux')
+let Provider = require('react-redux').Provider
 
 function pmatch (options) {
   return new Promise((resolve, reject) => {
@@ -33,7 +33,7 @@ function normalizeRoutes (routes, store) {
 
 function defaultWrap (context, store) {
   return React.createElement(Provider, {store: store},
-    React.createElement(context))
+    context)
 }
 
 module.exports = function (options) {
@@ -45,7 +45,7 @@ module.exports = function (options) {
     if (renderResponse.action === 'redirect') {
       return this.redirect(renderResponse.location)
     }
-    let context = React.createElement(Router.RoutingContext, renderResponse.props)
+    let context = React.createElement(Router.RouterContext, renderResponse.props)
     let wrapped = wrap(context, store)
     let html = ReactDOMServer.renderToString(wrapped)
     this.body = options.template(html)
