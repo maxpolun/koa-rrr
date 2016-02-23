@@ -37,6 +37,7 @@
     "global": [
       "describe",
       "it",
+      "fit",
       "jasmine",
       "expect",
       "beforeEach",

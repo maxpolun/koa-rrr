@@ -43,7 +43,7 @@ module.exports = function (options) {
     let routes = normalizeRoutes(options.routes, store)
     let renderResponse = yield pmatch({routes: routes, location: this.request.url})
     if (renderResponse.action === 'redirect') {
-      return this.redirect(renderResponse.location)
+      return this.redirect(renderResponse.location.pathname)
     }
     let context = React.createElement(Router.RouterContext, renderResponse.props)
     let wrapped = wrap(context, store)

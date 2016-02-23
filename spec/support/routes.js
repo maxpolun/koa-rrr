@@ -1,5 +1,5 @@
 import React from 'react'
-import {Router, Route} from 'react-router'
+import {Router, Route, Redirect} from 'react-router'
 
 class Hello extends React.Component {
   render () {
@@ -7,6 +7,14 @@ class Hello extends React.Component {
   }
 }
 
+class Goodbye extends React.Component {
+  render () {
+    return <h1>Goodbye</h1>
+  }
+}
+
 module.exports = <Router>
   <Route path='/' component={Hello} />
+  <Route path='/logout' component={Goodbye} />
+  <Redirect from='/redir' to='/logout' />
 </Router>

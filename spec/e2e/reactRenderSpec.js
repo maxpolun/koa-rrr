@@ -9,11 +9,32 @@ let routes = require('../support/routes')
 function fakeReducer () {}
 
 describe('rrr middleware', () => {
-  let server
+  let server, storeSpy, defaultOptions
 
   function start (middleware) {
     server = startServer(5050, middleware)
   }
+
+  function expectPromiseToResolve (promise, done) {
+    promise
+      .catch(done.fail)
+      .then(done)
+  }
+
+  function middlewareWithDefaults (options = {}) {
+    options = Object.assign({}, defaultOptions, options)
+    return koaRrr(options)
+  }
+
+  beforeEach(() => {
+    storeSpy = jasmine.createSpy('createStore')
+    storeSpy.and.callFake(() => create(fakeReducer))
+    defaultOptions = {
+      routes,
+      template: (html) => `<html><body>${html}</body></html>`,
+      createStore: storeSpy
+    }
+  })
 
   afterEach((done) => {
     if (server) {
@@ -21,17 +42,28 @@ describe('rrr middleware', () => {
     }
     done()
   })
+
   it('should render react', (done) => {
-    let middleware = koaRrr({
-      routes: routes,
-      template: (html) => `<html><body>${html}</body></html>`,
-      createStore: jasmine.createSpy('createStore').and.callFake(() => create(fakeReducer))
-    })
+    let middleware = middlewareWithDefaults()
     start(middleware)
-    fetch('http://localhost:5050/').then((response) => {
+    expectPromiseToResolve(fetch('http://localhost:5050/').then((response) => {
       expect(response.status).toEqual(200)
-    })
-      .catch(done.fail)
-      .then(done)
+    }), done)
+  })
+
+  it('should create the redux store', (done) => {
+    let middleware = middlewareWithDefaults()
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/').then(() => {
+      expect(storeSpy).toHaveBeenCalled()
+    }), done)
+  })
+
+  it('does an http redirect when there is a react redirect', (done) => {
+    let middleware = middlewareWithDefaults()
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/redir').then((response) => {
+      expect(response.url).toEqual('http://localhost:5050/logout')
+    }), done)
   })
 })
