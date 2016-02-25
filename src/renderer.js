@@ -45,6 +45,9 @@ module.exports = function (options) {
     if (renderResponse.action === 'redirect') {
       return this.redirect(renderResponse.location.pathname)
     }
+    if (!renderResponse.props) {
+      this.throw(404)
+    }
     let context = React.createElement(Router.RouterContext, renderResponse.props)
     let wrapped = wrap(context, store)
     let html = ReactDOMServer.renderToString(wrapped)

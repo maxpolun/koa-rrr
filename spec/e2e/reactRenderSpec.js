@@ -51,6 +51,28 @@ describe('rrr middleware', () => {
     }), done)
   })
 
+  it('should return html', (done) => {
+    let middleware = middlewareWithDefaults()
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/').then((response) => {
+      return response.text()
+    }).then((html) => {
+      expect(html).toMatch('<html><body><h1[^>]+>Hello!</h1></body></html>')
+    }), done)
+  })
+
+  it('can take different templates', (done) => {
+    let middleware = middlewareWithDefaults({
+      template: (html) => `<html><head></head><body>${html}</body></html>`
+    })
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/').then((response) => {
+      return response.text()
+    }).then((html) => {
+      expect(html).toMatch('<html><head></head><body><h1[^>]+>Hello!</h1></body></html>')
+    }), done)
+  })
+
   it('should create the redux store', (done) => {
     let middleware = middlewareWithDefaults()
     start(middleware)
@@ -64,6 +86,34 @@ describe('rrr middleware', () => {
     start(middleware)
     expectPromiseToResolve(fetch('http://localhost:5050/redir').then((response) => {
       expect(response.url).toEqual('http://localhost:5050/logout')
+    }), done)
+  })
+
+  it('can handle a function for routes', (done) => {
+    let routesFn = jasmine.createSpy('routes').and.returnValue(routes)
+    let middleware = middlewareWithDefaults({routes: routesFn})
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/').then((response) => {
+      expect(routesFn).toHaveBeenCalled()
+    }), done)
+  })
+
+  it('should 404 on missing route', (done) => {
+    let middleware = middlewareWithDefaults()
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/this/doesnt/exist').then((response) => {
+      expect(response.status).toEqual(404)
+    }), done)
+  })
+
+  it('should call the wrapper function', (done) => {
+    let wrapperSpy = jasmine.createSpy('wrap').and.callFake((x) => x)
+    let middleware = middlewareWithDefaults({
+      wrap: wrapperSpy
+    })
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050').then((response) => {
+      expect(wrapperSpy).toHaveBeenCalled()
     }), done)
   })
 })
