@@ -6,7 +6,9 @@ let create = require('redux').createStore
 
 let routes = require('../support/routes')
 
-function fakeReducer () {}
+function fakeReducer (state = {}) {
+  return {}
+}
 
 describe('rrr middleware', () => {
   let server, storeSpy, defaultOptions
@@ -70,6 +72,18 @@ describe('rrr middleware', () => {
       return response.text()
     }).then((html) => {
       expect(html).toMatch('<html><head></head><body><h1[^>]+>Hello!</h1></body></html>')
+    }), done)
+  })
+
+  it('passes the redux state to the template', (done) => {
+    let middleware = middlewareWithDefaults({
+      template: (html, state) => `<html><head></head><body>${html}<script>window.__REDUX_STORE__=${JSON.stringify(state)}</script></body></html>`
+    })
+    start(middleware)
+    expectPromiseToResolve(fetch('http://localhost:5050/').then((response) => {
+      return response.text()
+    }).then((html) => {
+      expect(html).toMatch('<script>window.__REDUX_STORE__={}</script>')
     }), done)
   })
 

@@ -51,6 +51,6 @@ module.exports = function (options) {
     let context = React.createElement(Router.RouterContext, renderResponse.props)
     let wrapped = wrap(context, store)
     let html = ReactDOMServer.renderToString(wrapped)
-    this.body = options.template(html)
+    this.body = options.template(html, store.getState())
   }
 }
